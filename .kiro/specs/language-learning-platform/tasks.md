@@ -543,7 +543,7 @@
 - [x] 25. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [-] 26. Write integration tests
+- [x] 26. Write integration tests
   - Test complete user flows (registration, lesson completion, progress tracking)
   - Test SRS and gamification workflows
   - Test content management workflows
@@ -551,7 +551,7 @@
   - Test file upload and retrieval
   - _Requirements: All_
 
-- [ ] 27. Write E2E tests with Playwright
+- [x] 27. Write E2E tests with Playwright
   - Test user registration and login flow
   - Test OAuth authentication
   - Test language selection
