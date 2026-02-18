@@ -142,3 +142,86 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
 
 CREATE TRIGGER update_lessons_updated_at BEFORE UPDATE ON lessons
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- User_Streaks table
+CREATE TABLE user_streaks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+  current_streak INTEGER DEFAULT 0,
+  longest_streak INTEGER DEFAULT 0,
+  last_activity_date DATE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_streaks_user_id ON user_streaks(user_id);
+
+CREATE TRIGGER update_user_streaks_updated_at BEFORE UPDATE ON user_streaks
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- User_XP table
+CREATE TABLE user_xp (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  xp_amount INTEGER NOT NULL,
+  source VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_xp_user_id ON user_xp(user_id);
+CREATE INDEX idx_user_xp_created_at ON user_xp(created_at);
+
+-- Achievements table
+CREATE TABLE achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL UNIQUE,
+  description TEXT,
+  icon VARCHAR(255),
+  criteria JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_achievements_name ON achievements(name);
+
+-- User_Achievements table
+CREATE TABLE user_achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  achievement_id UUID REFERENCES achievements(id) ON DELETE CASCADE,
+  earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, achievement_id)
+);
+
+CREATE INDEX idx_user_achievements_user_id ON user_achievements(user_id);
+CREATE INDEX idx_user_achievements_achievement_id ON user_achievements(achievement_id);
+
+-- Weak_Words table
+CREATE TABLE weak_words (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  image_text_id UUID REFERENCES image_texts(id) ON DELETE CASCADE,
+  error_count INTEGER DEFAULT 1,
+  success_count INTEGER DEFAULT 0,
+  last_reviewed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  next_review TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, image_text_id)
+);
+
+CREATE INDEX idx_weak_words_user_id ON weak_words(user_id);
+CREATE INDEX idx_weak_words_image_text_id ON weak_words(image_text_id);
+CREATE INDEX idx_weak_words_next_review ON weak_words(next_review);
+
+-- Password_Reset_Tokens table
+CREATE TABLE password_reset_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(255) NOT NULL UNIQUE,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_password_reset_tokens_token ON password_reset_tokens(token);
+CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
+CREATE INDEX idx_password_reset_tokens_expires_at ON password_reset_tokens(expires_at);

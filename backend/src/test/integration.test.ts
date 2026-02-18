@@ -316,6 +316,17 @@ describe('Integration Tests', () => {
 
       const tempImageId = uploadResponse.body.id
 
+      // Add text to the image
+      await request(app)
+        .post('/api/image-texts')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          imageId: tempImageId,
+          languageCode: 'es',
+          text: 'Test text',
+        })
+        .expect(201)
+
       // Create a lesson with this image
       const createLessonResponse = await request(app)
         .post('/api/lessons')
@@ -390,6 +401,17 @@ describe('Integration Tests', () => {
 
       imageId = uploadResponse.body.id
 
+      // Add text to the image
+      await request(app)
+        .post('/api/image-texts')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          imageId,
+          languageCode: 'es',
+          text: 'Test text',
+        })
+        .expect(201)
+
       const createLessonResponse = await request(app)
         .post('/api/lessons')
         .set('Authorization', `Bearer ${authToken}`)
@@ -425,10 +447,10 @@ describe('Integration Tests', () => {
         .send({
           exerciseId,
         })
-        .expect(200)
+        .expect(201)
 
-      expect(completeResponse.body.completed).toBe(true)
-      expect(completeResponse.body.exerciseId).toBe(exerciseId)
+      expect(completeResponse.body.progress.completed).toBe(true)
+      expect(completeResponse.body.progress.exerciseId).toBe(exerciseId)
 
       // Step 2: Retrieve user progress
       const progressResponse = await request(app)
@@ -436,8 +458,8 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(Array.isArray(progressResponse.body)).toBe(true)
-      const exerciseProgress = progressResponse.body.find(
+      expect(Array.isArray(progressResponse.body.progress)).toBe(true)
+      const exerciseProgress = progressResponse.body.progress.find(
         (p: any) => p.exerciseId === exerciseId
       )
       expect(exerciseProgress).toBeDefined()
@@ -510,6 +532,17 @@ describe('Integration Tests', () => {
 
       const tempImageId = uploadResponse.body.id
 
+      // Add text to the image
+      await request(app)
+        .post('/api/image-texts')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          imageId: tempImageId,
+          languageCode: 'es',
+          text: 'Test text',
+        })
+        .expect(201)
+
       const createLessonResponse = await request(app)
         .post('/api/lessons')
         .set('Authorization', `Bearer ${authToken}`)
@@ -543,7 +576,7 @@ describe('Integration Tests', () => {
         .send({
           exerciseId: tempExerciseId,
         })
-        .expect(200)
+        .expect(201)
 
       // Check streak (this would typically be handled by a gamification endpoint)
       // For now, we verify the progress was recorded
@@ -622,7 +655,7 @@ describe('Integration Tests', () => {
             score: 50 + Math.random() * 15, // Scores between 50-65
             recognizedText: 'Dificil',
           })
-          .expect(200)
+          .expect(201)
       }
 
       // The weak word should now be tracked in the system
@@ -696,7 +729,7 @@ describe('Integration Tests', () => {
       await request(app)
         .delete(`/api/images/${tempImageId}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(200)
+        .expect(204)
 
       // Verify deletion
       await request(app)
@@ -824,6 +857,17 @@ describe('Integration Tests', () => {
 
       const tempImageId = uploadResponse.body.id
 
+      // Add text to the image
+      await request(app)
+        .post('/api/image-texts')
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send({
+          imageId: tempImageId,
+          languageCode: 'es',
+          text: 'Test text',
+        })
+        .expect(201)
+
       const createLessonResponse = await request(app)
         .post('/api/lessons')
         .set('Authorization', `Bearer ${user1Token}`)
@@ -857,7 +901,7 @@ describe('Integration Tests', () => {
         .send({
           exerciseId: tempExerciseId,
         })
-        .expect(200)
+        .expect(201)
 
       // User 1 should see their progress
       const user1Progress = await request(app)

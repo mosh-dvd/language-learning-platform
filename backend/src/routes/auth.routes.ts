@@ -70,12 +70,14 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       const userData = CreateUserSchema.parse(req.body);
       const user = await authService.register(userData);
 
-      // Remove password hash from response
-      const { passwordHash, ...userWithoutPassword } = user;
+      // Generate auth token for the new user
+      const authToken = await authService.login(user.email, userData.password);
 
       res.status(201).json({
         message: 'User registered successfully',
-        user: userWithoutPassword,
+        user: authToken.user,
+        token: authToken.token,
+        expiresAt: authToken.expiresAt,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

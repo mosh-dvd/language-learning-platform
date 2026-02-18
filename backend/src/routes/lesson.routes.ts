@@ -235,6 +235,35 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 /**
+ * PATCH /api/lessons/:id
+ * Partially update a lesson
+ */
+router.patch('/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const input = UpdateLessonSchema.parse(req.body);
+    const lesson = await lessonService.updateLesson(id, input);
+    
+    if (!lesson) {
+      res.status(404).json({ error: 'Lesson not found' });
+      return;
+    }
+    
+    res.status(200).json(lesson);
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Validation error', details: error });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
+    } else {
+      res.status(500).json({ error: 'An unknown error occurred' });
+    }
+  }
+});
+
+/**
  * @swagger
  * /api/lessons/{id}:
  *   delete:

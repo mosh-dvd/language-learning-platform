@@ -30,9 +30,12 @@ export class AuthService {
   private userRepository: UserRepository;
   private passwordResetTokenRepository: PasswordResetTokenRepository;
 
-  constructor() {
-    this.userRepository = new UserRepository(pool);
-    this.passwordResetTokenRepository = new PasswordResetTokenRepository(pool);
+  constructor(
+    userRepository?: UserRepository,
+    passwordResetTokenRepository?: PasswordResetTokenRepository
+  ) {
+    this.userRepository = userRepository || new UserRepository(pool);
+    this.passwordResetTokenRepository = passwordResetTokenRepository || new PasswordResetTokenRepository(pool);
   }
 
   async register(userData: CreateUserInput): Promise<User> {

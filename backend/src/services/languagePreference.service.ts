@@ -10,8 +10,8 @@ const SUPPORTED_LANGUAGES = [
 export class LanguagePreferenceService {
   private userRepository: UserRepository;
 
-  constructor() {
-    this.userRepository = new UserRepository(pool);
+  constructor(userRepository?: UserRepository) {
+    this.userRepository = userRepository || new UserRepository(pool);
   }
 
   isLanguageSupported(languageCode: string): boolean {

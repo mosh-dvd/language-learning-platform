@@ -311,17 +311,16 @@ describe('AuthService', () => {
       // Request password reset
       const resetToken = await authService.requestPasswordReset(uniqueEmail);
 
-      // Manually expire the token by replacing it in the map
-      const token = mockTokens.get(resetToken);
+      // Manually expire the token by updating it directly
+      const token = await mockPasswordResetTokenRepository.findByToken(resetToken);
       if (token) {
-        const expiredToken = { ...token, expiresAt: new Date(Date.now() - 1000) };
-        mockTokens.set(resetToken, expiredToken);
+        token.expiresAt = new Date(Date.now() - 1000); // Set to past
       }
 
       // Should reject expired token
       await expect(
         authService.resetPassword(resetToken, 'newpassword123')
-      ).rejects.toThrow('expired');
+      ).rejects.toThrow(/expired/i);
 
       mockUsers.delete(uniqueEmail);
       mockTokens.delete(resetToken);

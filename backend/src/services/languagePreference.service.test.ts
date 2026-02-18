@@ -59,11 +59,21 @@ describe('LanguagePreferenceService', () => {
             };
             mockUsers.set(userId, user);
 
+            // Verify user was added
+            const foundUser = mockUsers.get(userId);
+            expect(foundUser).toBeDefined();
+
             await languageService.setLanguagePreference(userId, languageCode);
+            
+            // Verify user still exists after update
+            const updatedUser = mockUsers.get(userId);
+            expect(updatedUser).toBeDefined();
+            
             const preference = await languageService.getLanguagePreference(userId);
             expect(preference).toBe(languageCode);
             
-            // Don't delete - let beforeEach handle cleanup
+            // Clean up
+            mockUsers.delete(userId);
           }
         ),
         { numRuns: 100 }
