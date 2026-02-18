@@ -15,13 +15,16 @@ describe('LanguagePreferenceService', () => {
 
     mockUserRepository = {
       findById: vi.fn(async (id: string) => {
-        return Array.from(mockUsers.values()).find(u => u.id === id) || null;
+        const user = mockUsers.get(id);
+        return user || null;
       }),
       update: vi.fn(async (id: string, updates: any) => {
-        const user = Array.from(mockUsers.values()).find(u => u.id === id);
-        if (!user) throw new Error('User not found');
+        const user = mockUsers.get(id);
+        if (!user) {
+          throw new Error(`User not found for update: ${id}, available: ${Array.from(mockUsers.keys()).join(', ')}`);
+        }
         const updated = { ...user, ...updates, updatedAt: new Date() };
-        mockUsers.set(user.id, updated);
+        mockUsers.set(id, updated);
         return updated;
       }),
     } as any;
@@ -49,7 +52,7 @@ describe('LanguagePreferenceService', () => {
             const userId = uuidv4();
             const user: User = {
               id: userId,
-              email: 'test@example.com',
+              email: `test-${userId}@example.com`,
               nativeLanguage: 'en',
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -59,8 +62,8 @@ describe('LanguagePreferenceService', () => {
             await languageService.setLanguagePreference(userId, languageCode);
             const preference = await languageService.getLanguagePreference(userId);
             expect(preference).toBe(languageCode);
-
-            mockUsers.delete(userId);
+            
+            // Don't delete - let beforeEach handle cleanup
           }
         ),
         { numRuns: 100 }

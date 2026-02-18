@@ -94,6 +94,16 @@ describe('ExerciseService', () => {
       findByImageId: vi.fn(async (imageId: string) => {
         return Array.from(mockImageTexts.values()).filter(t => t.imageId === imageId);
       }),
+      list: vi.fn(async (filters: any = {}) => {
+        let results = Array.from(mockImageTexts.values());
+        if (filters.imageId) {
+          results = results.filter(t => t.imageId === filters.imageId);
+        }
+        if (filters.languageCode) {
+          results = results.filter(t => t.languageCode === filters.languageCode);
+        }
+        return results;
+      }),
     } as any;
 
     exerciseService = new ExerciseService({} as any);

@@ -540,10 +540,10 @@
     - Test API documentation interface
     - _Requirements: All API requirements_
 
-- [-] 25. Checkpoint - Ensure all tests pass
+- [x] 25. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 26. Write integration tests
+- [-] 26. Write integration tests
   - Test complete user flows (registration, lesson completion, progress tracking)
   - Test SRS and gamification workflows
   - Test content management workflows

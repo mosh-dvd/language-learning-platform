@@ -144,7 +144,7 @@ describe('AuthService', () => {
 
     it('should hash passwords before storing', async () => {
       const userData = {
-        email: 'hash-test@example.com',
+        email: `hash-test-${Date.now()}@example.com`,
         password: 'securepassword123',
         nativeLanguage: 'en',
       };
@@ -219,8 +219,9 @@ describe('AuthService', () => {
 
     it('should reject OAuth login if email already exists with password auth', async () => {
       // Create a user with email/password
+      const uniqueEmail = `existing-${Date.now()}@example.com`;
       const userData = {
-        email: 'existing@example.com',
+        email: uniqueEmail,
         password: 'password123',
         nativeLanguage: 'en',
       };
@@ -228,10 +229,10 @@ describe('AuthService', () => {
 
       // Try to login with OAuth using same email
       await expect(
-        authService.loginWithOAuth('google', 'google-id-123', userData.email, 'Test User')
+        authService.loginWithOAuth('google', 'google-id-123', uniqueEmail, 'Test User')
       ).rejects.toThrow('already exists');
 
-      mockUsers.delete(userData.email);
+      mockUsers.delete(uniqueEmail);
     });
 
     it('should generate valid JWT tokens for OAuth users', async () => {
@@ -299,20 +300,22 @@ describe('AuthService', () => {
     });
 
     it('should reject expired tokens', async () => {
-      // Register user
+      // Register user with unique email
+      const uniqueEmail = `expire-test-${Date.now()}@example.com`;
       const user = await authService.register({
-        email: 'expire-test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         nativeLanguage: 'en',
       });
 
       // Request password reset
-      const resetToken = await authService.requestPasswordReset('expire-test@example.com');
+      const resetToken = await authService.requestPasswordReset(uniqueEmail);
 
-      // Manually expire the token
+      // Manually expire the token by replacing it in the map
       const token = mockTokens.get(resetToken);
       if (token) {
-        token.expiresAt = new Date(Date.now() - 1000); // Expired 1 second ago
+        const expiredToken = { ...token, expiresAt: new Date(Date.now() - 1000) };
+        mockTokens.set(resetToken, expiredToken);
       }
 
       // Should reject expired token
@@ -320,7 +323,7 @@ describe('AuthService', () => {
         authService.resetPassword(resetToken, 'newpassword123')
       ).rejects.toThrow('expired');
 
-      mockUsers.delete('expire-test@example.com');
+      mockUsers.delete(uniqueEmail);
       mockTokens.delete(resetToken);
     });
 
@@ -333,29 +336,30 @@ describe('AuthService', () => {
     it('should update password after successful reset', async () => {
       const oldPassword = 'oldpassword123';
       const newPassword = 'newpassword456';
+      const uniqueEmail = `reset-test-${Date.now()}@example.com`;
 
       // Register user
       const user = await authService.register({
-        email: 'reset-test@example.com',
+        email: uniqueEmail,
         password: oldPassword,
         nativeLanguage: 'en',
       });
 
       // Request and use reset token
-      const resetToken = await authService.requestPasswordReset('reset-test@example.com');
+      const resetToken = await authService.requestPasswordReset(uniqueEmail);
       await authService.resetPassword(resetToken, newPassword);
 
       // Old password should not work
       await expect(
-        authService.login('reset-test@example.com', oldPassword)
+        authService.login(uniqueEmail, oldPassword)
       ).rejects.toThrow('Invalid email or password');
 
       // New password should work
-      const authToken = await authService.login('reset-test@example.com', newPassword);
+      const authToken = await authService.login(uniqueEmail, newPassword);
       expect(authToken).toBeDefined();
-      expect(authToken.user.email).toBe('reset-test@example.com');
+      expect(authToken.user.email).toBe(uniqueEmail);
 
-      mockUsers.delete('reset-test@example.com');
+      mockUsers.delete(uniqueEmail);
       mockTokens.delete(resetToken);
     });
   });
