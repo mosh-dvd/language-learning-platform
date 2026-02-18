@@ -355,7 +355,7 @@ describe('Integration Tests', () => {
       await request(app)
         .delete(`/api/images/${tempImageId}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(200)
+        .expect(204)
 
       // Verify the lesson's exercise no longer references the deleted image
       const getLessonResponse = await request(app)
@@ -458,8 +458,9 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(Array.isArray(progressResponse.body.progress)).toBe(true)
-      const exerciseProgress = progressResponse.body.progress.find(
+      expect(progressResponse.body).toHaveProperty('progress')
+      expect(Array.isArray(progressResponse.body.progress.recentActivity)).toBe(true)
+      const exerciseProgress = progressResponse.body.progress.recentActivity.find(
         (p: any) => p.exerciseId === exerciseId
       )
       expect(exerciseProgress).toBeDefined()
@@ -471,8 +472,8 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(lessonProgressResponse.body.lessonId).toBe(lessonId)
-      expect(lessonProgressResponse.body.completedExercises).toBeGreaterThan(0)
+      expect(lessonProgressResponse.body.progress.lessonId).toBe(lessonId)
+      expect(lessonProgressResponse.body.progress.completed).toBeGreaterThan(0)
     })
 
     it('should record and retrieve pronunciation scores', async () => {
@@ -485,20 +486,21 @@ describe('Integration Tests', () => {
           score: 85.5,
           recognizedText: 'Hola',
         })
-        .expect(200)
+        .expect(201)
 
-      expect(scoreResponse.body.score).toBe(85.5)
-      expect(scoreResponse.body.recognizedText).toBe('Hola')
+      expect(parseFloat(scoreResponse.body.pronunciationScore.score)).toEqual(85.5)
+      expect(scoreResponse.body.pronunciationScore.recognizedText).toBe('Hola')
 
       // Retrieve pronunciation scores
       const scoresResponse = await request(app)
-        .get(`/api/progress/pronunciation/${exerciseId}`)
+        .get(`/api/progress/pronunciation/exercise/${exerciseId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(Array.isArray(scoresResponse.body)).toBe(true)
-      expect(scoresResponse.body.length).toBeGreaterThan(0)
-      expect(scoresResponse.body[0].score).toBe(85.5)
+      expect(scoresResponse.body).toHaveProperty('scores')
+      expect(Array.isArray(scoresResponse.body.scores)).toBe(true)
+      expect(scoresResponse.body.scores.length).toBeGreaterThan(0)
+      expect(parseFloat(scoresResponse.body.scores[0].score)).toEqual(85.5)
     })
   })
 
@@ -585,8 +587,9 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(Array.isArray(progressResponse.body)).toBe(true)
-      expect(progressResponse.body.length).toBeGreaterThan(0)
+      expect(progressResponse.body).toHaveProperty('progress')
+      expect(progressResponse.body.progress).toHaveProperty('totalExercisesCompleted')
+      expect(progressResponse.body.progress.totalExercisesCompleted).toBeGreaterThan(0)
 
       // Cleanup
       await pool.query('DELETE FROM lessons WHERE id = $1', [tempLessonId])
@@ -661,12 +664,13 @@ describe('Integration Tests', () => {
       // The weak word should now be tracked in the system
       // Verify by checking pronunciation scores
       const scoresResponse = await request(app)
-        .get(`/api/progress/pronunciation/${tempExerciseId}`)
+        .get(`/api/progress/pronunciation/exercise/${tempExerciseId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(scoresResponse.body.length).toBe(5)
-      const avgScore = scoresResponse.body.reduce((sum: number, s: any) => sum + s.score, 0) / 5
+      expect(scoresResponse.body).toHaveProperty('scores')
+      expect(scoresResponse.body.scores.length).toBe(5)
+      const avgScore = scoresResponse.body.scores.reduce((sum: number, s: any) => sum + parseFloat(s.score), 0) / 5
       expect(avgScore).toBeLessThan(70)
 
       // Cleanup
@@ -909,7 +913,9 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${user1Token}`)
         .expect(200)
 
-      expect(user1Progress.body.length).toBeGreaterThan(0)
+      expect(user1Progress.body).toHaveProperty('progress')
+      expect(user1Progress.body.progress).toHaveProperty('totalExercisesCompleted')
+      expect(user1Progress.body.progress.totalExercisesCompleted).toBeGreaterThan(0)
 
       // User 2 should not see User 1's progress
       const user2Progress = await request(app)
@@ -917,7 +923,9 @@ describe('Integration Tests', () => {
         .set('Authorization', `Bearer ${user2Token}`)
         .expect(200)
 
-      const user2HasUser1Exercise = user2Progress.body.some(
+      expect(user2Progress.body).toHaveProperty('progress')
+      expect(user2Progress.body.progress).toHaveProperty('recentActivity')
+      const user2HasUser1Exercise = user2Progress.body.progress.recentActivity.some(
         (p: any) => p.exerciseId === tempExerciseId
       )
       expect(user2HasUser1Exercise).toBe(false)
