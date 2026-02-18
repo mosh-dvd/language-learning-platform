@@ -1,0 +1,178 @@
+/**
+ * Accessibility Styles
+ * Global styles for keyboard navigation, focus indicators, and WCAG compliance
+ * Requirements: 15.3, 15.4, 15.5
+ */
+
+/* Enhanced focus indicators for keyboard navigation */
+*:focus {
+  outline: 2px solid #3b82f6; /* blue-500 */
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #3b82f6; /* blue-500 */
+  outline-offset: 2px;
+}
+
+/* High contrast focus for buttons */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid #2563eb; /* blue-600 */
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Focus for form inputs */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 0;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Skip to main content link (for screen readers and keyboard users) */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1rem 1.5rem;
+  background-color: #1f2937; /* gray-800 */
+  color: white;
+  text-decoration: none;
+  border-radius: 0.375rem;
+}
+
+.skip-to-main:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* Ensure interactive elements have visible focus */
+[tabindex]:focus-visible,
+[contenteditable]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Keyboard navigation helper - show focus ring only for keyboard users */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  *:focus-visible {
+    outline-width: 3px;
+    outline-color: currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Ensure sufficient color contrast for text */
+.text-contrast-aa {
+  /* Normal text: 4.5:1 contrast ratio */
+  color: #1f2937; /* gray-800 on white background */
+}
+
+.text-contrast-aa-large {
+  /* Large text (18pt+): 3:1 contrast ratio */
+  color: #374151; /* gray-700 on white background */
+}
+
+/* Focus trap for modals and dialogs */
+.focus-trap {
+  position: relative;
+}
+
+.focus-trap::before,
+.focus-trap::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* Keyboard shortcut indicators */
+.kbd {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-height: 1;
+  color: #374151; /* gray-700 */
+  background-color: #f3f4f6; /* gray-100 */
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Accessible button states */
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Link focus styles */
+a:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+/* Ensure images have proper alt text indicator in dev mode */
+img:not([alt]) {
+  border: 3px dashed #ef4444; /* red-500 - indicates missing alt text */
+}
+
+/* ARIA live region styling */
+[aria-live] {
+  position: relative;
+}
+
+/* Focus within for container elements */
+.focus-within-ring:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

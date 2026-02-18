@@ -1,0 +1,195 @@
+/**
+ * Responsive Design Utilities
+ * Mobile-first responsive design utilities for the language learning platform
+ * Implements Requirements: 8.1, 8.2
+ */
+
+/* Touch target sizes for mobile (minimum 44x44px for accessibility) */
+@media (max-width: 640px) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Responsive container utilities */
+.container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Responsive text utilities */
+.text-responsive-sm {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-sm {
+    font-size: 1rem;
+  }
+}
+
+.text-responsive-base {
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-base {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-base {
+    font-size: 1.25rem;
+  }
+}
+
+.text-responsive-lg {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-lg {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-lg {
+    font-size: 1.875rem;
+  }
+}
+
+/* Responsive spacing utilities */
+.spacing-responsive-sm {
+  padding: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .spacing-responsive-sm {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spacing-responsive-sm {
+    padding: 1rem;
+  }
+}
+
+/* Mobile-specific utilities */
+@media (max-width: 639px) {
+  .mobile-full-width {
+    width: 100%;
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+  }
+
+  .mobile-hide {
+    display: none;
+  }
+}
+
+/* Desktop-specific utilities */
+@media (min-width: 640px) {
+  .desktop-show {
+    display: block;
+  }
+}
+
+@media (max-width: 639px) {
+  .desktop-show {
+    display: none;
+  }
+}
+
+/* Responsive grid utilities */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Responsive card layouts */
+.card-responsive {
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .card-responsive {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-responsive {
+    padding: 2rem;
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Safe area insets for mobile devices (notches, etc.) */
+@supports (padding: max(0px)) {
+  .safe-area-inset-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-inset-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .safe-area-inset-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
