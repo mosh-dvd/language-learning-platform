@@ -449,6 +449,6 @@ describe('ImageTextEditor', () => {
       expect(screen.getByText(/available translations/i)).toBeInTheDocument();
       expect(screen.getByText(/english/i)).toBeInTheDocument();
       expect(screen.getByText(/spanish/i)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 });

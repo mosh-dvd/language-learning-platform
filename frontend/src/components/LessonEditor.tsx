@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiClient from '../utils/apiClient';
 
 interface Exercise {
   id: string;
@@ -74,13 +75,8 @@ export const LessonEditor: React.FC<LessonEditorProps> = ({
   const loadLesson = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/lessons/${lessonId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setLesson(data);
-      } else {
-        throw new Error('Failed to load lesson');
-      }
+      const response = await apiClient.get(`/lessons/${lessonId}`);
+      setLesson(response.data);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load lesson';
       setValidationError(errorMessage);
@@ -135,31 +131,23 @@ export const LessonEditor: React.FC<LessonEditorProps> = ({
     setValidationError(null);
 
     try {
-      const url = lessonId ? `/api/lessons/${lessonId}` : '/api/lessons';
-      const method = lessonId ? 'PUT' : 'POST';
-      
       const body = lessonId
         ? { title: lesson.title, targetLanguage: lesson.targetLanguage }
         : { ...lesson, createdBy: userId };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save lesson');
+      let savedLesson;
+      if (lessonId) {
+        const response = await apiClient.put(`/lessons/${lessonId}`, body);
+        savedLesson = response.data;
+      } else {
+        const response = await apiClient.post('/lessons', body);
+        savedLesson = response.data;
       }
 
-      const savedLesson = await response.json();
       setLesson(savedLesson);
       onSave?.(savedLesson);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to save lesson';
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to save lesson';
       setValidationError(errorMessage);
       onError?.(errorMessage);
     } finally {
@@ -181,18 +169,10 @@ export const LessonEditor: React.FC<LessonEditorProps> = ({
 
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/lessons/${lessonId}/publish`, {
-        method: 'PUT',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to publish lesson');
-      }
-
-      const updatedLesson = await response.json();
-      setLesson(updatedLesson);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to publish lesson';
+      const response = await apiClient.put(`/lessons/${lessonId}/publish`);
+      setLesson(response.data);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to publish lesson';
       setValidationError(errorMessage);
       onError?.(errorMessage);
     } finally {
@@ -205,18 +185,10 @@ export const LessonEditor: React.FC<LessonEditorProps> = ({
 
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/lessons/${lessonId}/unpublish`, {
-        method: 'PUT',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to unpublish lesson');
-      }
-
-      const updatedLesson = await response.json();
-      setLesson(updatedLesson);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to unpublish lesson';
+      const response = await apiClient.put(`/lessons/${lessonId}/unpublish`);
+      setLesson(response.data);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to unpublish lesson';
       setValidationError(errorMessage);
       onError?.(errorMessage);
     } finally {

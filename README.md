@@ -2,6 +2,26 @@
 
 An interactive language learning platform inspired by Rosetta Stone, combining images, text, Text-to-Speech (TTS), and Speech-to-Text (STT) for an immersive learning experience.
 
+**🖥️ Now available as a Desktop Application!** See [DESKTOP_APP.md](DESKTOP_APP.md) for details.
+
+## Quick Start
+
+### Desktop Application (Recommended)
+```bash
+npm install
+npm start
+```
+
+This will launch the application as a native desktop app.
+
+### Web Application
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:5174 in your browser.
+
 ## Project Structure
 
 This is a monorepo containing both frontend and backend applications:

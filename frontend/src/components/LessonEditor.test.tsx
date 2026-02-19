@@ -56,7 +56,7 @@ describe('LessonEditor', () => {
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Lesson')).toBeInTheDocument();
       expect(screen.getByDisplayValue('es')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('validates that lesson title is required', async () => {
@@ -192,7 +192,7 @@ describe('LessonEditor', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText(/image id/i)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     const imageIdInput = screen.getByLabelText(/image id/i);
     await user.type(imageIdInput, 'img-1');
@@ -202,7 +202,7 @@ describe('LessonEditor', () => {
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith(savedLesson);
-    });
+    }, { timeout: 3000 });
   });
 
   it('publishes a lesson', async () => {

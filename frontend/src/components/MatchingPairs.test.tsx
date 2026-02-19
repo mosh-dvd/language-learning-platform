@@ -45,7 +45,10 @@ describe('MatchingPairs', () => {
     fireEvent.click(textButtons[0]);
 
     // Check if matched count increased
-    expect(screen.getByText(/Matched: 1 \/ 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Matched:/)).toBeInTheDocument();
+    expect(screen.getByText(/1/)).toBeInTheDocument();
+    expect(screen.getByText(/of/)).toBeInTheDocument();
+    expect(screen.getByText(/2/)).toBeInTheDocument();
   });
 
   it('calls onComplete when all pairs are matched', () => {

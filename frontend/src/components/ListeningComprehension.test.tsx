@@ -39,7 +39,7 @@ describe('ListeningComprehension', () => {
 
     expect(screen.getByText('Listening Comprehension')).toBeInTheDocument();
     expect(
-      screen.getByText('Listen to the audio and select the matching image')
+      screen.getByText(/Listen to the audio and select the matching image/i)
     ).toBeInTheDocument();
   });
 

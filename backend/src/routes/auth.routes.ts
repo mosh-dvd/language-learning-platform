@@ -67,11 +67,15 @@ const router = Router();
 // Register
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
     try {
+      console.log('Registration request received:', { email: req.body.email, nativeLanguage: req.body.nativeLanguage });
       const userData = CreateUserSchema.parse(req.body);
+      console.log('Validation passed, creating user...');
       const user = await authService.register(userData);
+      console.log('User created successfully:', user.id);
 
       // Generate auth token for the new user
       const authToken = await authService.login(user.email, userData.password);
+      console.log('Auth token generated');
 
       res.status(201).json({
         message: 'User registered successfully',
@@ -80,6 +84,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
         expiresAt: authToken.expiresAt,
       });
     } catch (error) {
+      console.error('Registration error:', error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ error: 'Validation error', details: error.errors });
         return;

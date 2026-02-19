@@ -1,7 +1,13 @@
 {
   "name": "language-learning-platform",
   "version": "1.0.0",
+  "description": "Interactive language learning platform with speech recognition and gamification",
+  "author": {
+    "name": "Language Learning Platform",
+    "email": "info@languagelearning.com"
+  },
   "private": true,
+  "main": "electron/main.js",
   "workspaces": [
     "frontend",
     "backend"
@@ -10,7 +16,13 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
+    "dev:electron": "cross-env NODE_ENV=development concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"wait-on http://localhost:5174 http://localhost:3000/health && electron . --no-sandbox\"",
+    "start": "npm run dev:electron",
     "build": "npm run build --workspace=frontend && npm run build --workspace=backend",
+    "build:electron": "npm run build && electron-builder",
+    "build:electron:win": "npm run build && electron-builder --win",
+    "build:electron:mac": "npm run build && electron-builder --mac",
+    "build:electron:linux": "npm run build && electron-builder --linux",
     "test": "npm run test --workspaces",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -20,13 +32,62 @@
     "lint": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
+  "build": {
+    "appId": "com.languagelearning.app",
+    "productName": "Language Learning Platform",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/**/*",
+      "frontend/dist/**/*",
+      "backend/src/**/*",
+      "backend/package.json",
+      "backend/node_modules/**/*",
+      "!backend/node_modules/**/test/**",
+      "!backend/node_modules/**/*.md",
+      "!backend/node_modules/**/.bin",
+      "!backend/**/*.test.ts"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/uploads",
+        "to": "uploads"
+      },
+      {
+        "from": "backend/.env.example",
+        "to": "backend/.env"
+      }
+    ],
+    "asarUnpack": [
+      "backend/**/*"
+    ],
+    "win": {
+      "target": ["nsis"],
+      "icon": "frontend/public/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "frontend/public/icon.icns",
+      "category": "public.app-category.education"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "frontend/public/icon.png",
+      "category": "Education"
+    }
+  },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "concurrently": "^8.2.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
+    "electron": "^40.4.1",
+    "electron-builder": "^26.8.1",
     "eslint": "^8.55.0",
     "prettier": "^3.1.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "wait-on": "^9.0.4"
   }
 }

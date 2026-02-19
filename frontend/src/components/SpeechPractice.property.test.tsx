@@ -59,11 +59,20 @@ vi.mock('../services/pronunciationValidator.service', () => ({
 }));
 
 describe('SpeechPractice Property-Based Tests', () => {
+  let cleanup: (() => void) | null = null;
+
   beforeEach(() => {
     vi.clearAllMocks();
     (sttServiceModule.sttService as any)._clearCallbacks();
     vi.spyOn(sttServiceModule.sttService, 'isSupported').mockReturnValue(true);
     vi.spyOn(sttServiceModule.sttService, 'startListening').mockResolvedValue();
+  });
+
+  afterEach(() => {
+    if (cleanup) {
+      cleanup();
+      cleanup = null;
+    }
   });
 
   // Feature: language-learning-platform, Property 14: Score-based feedback
@@ -75,6 +84,12 @@ describe('SpeechPractice Property-Based Tests', () => {
           fc.integer({ min: 0, max: 100 }), // threshold
           fc.integer({ min: 0, max: 100 }), // score
           async (threshold, score) => {
+            // Clean up any previous render
+            if (cleanup) {
+              cleanup();
+              cleanup = null;
+            }
+
             // Mock the pronunciation validator to return the generated score
             vi.spyOn(pronunciationValidatorModule.pronunciationValidator, 'calculateScore')
               .mockReturnValue(score);
@@ -90,6 +105,7 @@ describe('SpeechPractice Property-Based Tests', () => {
                 threshold={threshold}
               />
             );
+            cleanup = unmount;
 
             // Start recording
             const button = screen.getByRole('button', { name: /start recording/i });
@@ -123,8 +139,6 @@ describe('SpeechPractice Property-Based Tests', () => {
               // Should show retry button
               expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
             }
-
-            unmount();
           }
         ),
         { numRuns: 100 }
@@ -139,6 +153,12 @@ describe('SpeechPractice Property-Based Tests', () => {
           async (threshold, score) => {
             // Only test cases where score is below threshold
             fc.pre(score < threshold);
+
+            // Clean up any previous render
+            if (cleanup) {
+              cleanup();
+              cleanup = null;
+            }
 
             // Mock the pronunciation validator
             vi.spyOn(pronunciationValidatorModule.pronunciationValidator, 'calculateScore')
@@ -155,6 +175,7 @@ describe('SpeechPractice Property-Based Tests', () => {
                 threshold={threshold}
               />
             );
+            cleanup = unmount;
 
             // Start recording
             const button = screen.getByRole('button', { name: /start recording/i });
@@ -181,8 +202,6 @@ describe('SpeechPractice Property-Based Tests', () => {
               expect(screen.queryByText('Pronunciation Score:')).not.toBeInTheDocument();
               expect(screen.queryByRole('button', { name: /try again/i })).not.toBeInTheDocument();
             });
-
-            unmount();
           }
         ),
         { numRuns: 50 }
@@ -194,6 +213,12 @@ describe('SpeechPractice Property-Based Tests', () => {
         fc.asyncProperty(
           fc.integer({ min: 0, max: 100 }), // score
           async (score) => {
+            // Clean up any previous render
+            if (cleanup) {
+              cleanup();
+              cleanup = null;
+            }
+
             // Mock the pronunciation validator
             vi.spyOn(pronunciationValidatorModule.pronunciationValidator, 'calculateScore')
               .mockReturnValue(score);
@@ -210,6 +235,7 @@ describe('SpeechPractice Property-Based Tests', () => {
                 threshold={threshold}
               />
             );
+            cleanup = unmount;
 
             // Start recording
             const button = screen.getByRole('button', { name: /start recording/i });
@@ -239,7 +265,9 @@ describe('SpeechPractice Property-Based Tests', () => {
               expect(screen.getByText(/try again to improve your pronunciation/i)).toBeInTheDocument();
             }
 
-            unmount();
+            // Clean up after this iteration
+            cleanup();
+            cleanup = null;
           }
         ),
         { numRuns: 100 }
@@ -263,6 +291,12 @@ describe('SpeechPractice Property-Based Tests', () => {
             const results: boolean[] = [];
 
             for (let i = 0; i < 2; i++) {
+              // Clean up any previous render
+              if (cleanup) {
+                cleanup();
+                cleanup = null;
+              }
+
               const { unmount } = render(
                 <SpeechPractice
                   expectedText="Test text"
@@ -271,6 +305,7 @@ describe('SpeechPractice Property-Based Tests', () => {
                   threshold={threshold}
                 />
               );
+              cleanup = unmount;
 
               // Start recording
               const button = screen.getByRole('button', { name: /start recording/i });
@@ -292,7 +327,8 @@ describe('SpeechPractice Property-Based Tests', () => {
               const hasRetryButton = screen.queryByRole('button', { name: /try again/i }) !== null;
               results.push(hasRetryButton);
 
-              unmount();
+              cleanup();
+              cleanup = null;
             }
 
             // Property: Both renders should show the same feedback (retry button presence)

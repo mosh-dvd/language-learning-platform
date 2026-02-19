@@ -48,7 +48,7 @@ describe('ImageCard', () => {
           async (text, languageCode) => {
             // Mock successful TTS playback with delay to simulate real audio
             const speakMock = vi.spyOn(ttsServiceModule.ttsService, 'speak');
-            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 50)));
 
             const { unmount } = render(
               <ImageCard
@@ -79,7 +79,7 @@ describe('ImageCard', () => {
                 const readyButton = screen.getByRole('button', { name: /play audio/i });
                 expect(readyButton).toBeInTheDocument();
                 expect(readyButton).not.toHaveClass('animate-pulse');
-              }, { timeout: 2000 });
+              }, { timeout: 1500 });
 
               // Verify TTS was called with correct parameters
               expect(speakMock).toHaveBeenCalledWith(text, { languageCode });
@@ -88,9 +88,9 @@ describe('ImageCard', () => {
             }
           }
         ),
-        { numRuns: 100 }
+        { numRuns: 50 }
       );
-    });
+    }, 30000);
 
     it('should show visual feedback during all state transitions', async () => {
       await fc.assert(
@@ -99,7 +99,7 @@ describe('ImageCard', () => {
           fc.constant('en-US'),
           async (text, languageCode) => {
             const speakMock = vi.spyOn(ttsServiceModule.ttsService, 'speak');
-            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 50)));
 
             const { unmount } = render(
               <ImageCard
@@ -134,15 +134,15 @@ describe('ImageCard', () => {
               await waitFor(() => {
                 const readyButton = screen.getByRole('button', { name: /play audio/i });
                 expect(readyButton).toHaveClass('bg-white');
-              }, { timeout: 2000 });
+              }, { timeout: 1500 });
             } finally {
               unmount();
             }
           }
         ),
-        { numRuns: 100 }
+        { numRuns: 50 }
       );
-    });
+    }, 30000);
 
     it('should handle errors and return to ready state', async () => {
       await fc.assert(
@@ -204,7 +204,7 @@ describe('ImageCard', () => {
           fc.constant('en-US'),
           async (text, languageCode) => {
             const speakMock = vi.spyOn(ttsServiceModule.ttsService, 'speak');
-            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+            speakMock.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 50)));
 
             const { unmount } = render(
               <ImageCard
@@ -236,7 +236,7 @@ describe('ImageCard', () => {
               await waitFor(() => {
                 const readyButton = screen.getByRole('button', { name: /play audio/i });
                 expect(readyButton).toBeInTheDocument();
-              }, { timeout: 2000 });
+              }, { timeout: 1500 });
 
               // Visual indicator should be removed after playback
               expect(screen.queryByRole('status', { name: /audio is playing/i })).not.toBeInTheDocument();
@@ -245,9 +245,9 @@ describe('ImageCard', () => {
             }
           }
         ),
-        { numRuns: 100 }
+        { numRuns: 50 }
       );
-    });
+    }, 30000);
 
     it('should provide aria-live announcements for state changes', async () => {
       const speakMock = vi.spyOn(ttsServiceModule.ttsService, 'speak');

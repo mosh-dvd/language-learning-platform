@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "echo 'Using tsx for production' && mkdir -p dist",
+    "build:check": "tsc --noEmit",
+    "start": "tsx src/index.ts",
     "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",

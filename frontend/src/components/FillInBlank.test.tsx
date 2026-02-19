@@ -17,7 +17,7 @@ describe('FillInBlank', () => {
     expect(screen.getByText('Fill in the Blank')).toBeInTheDocument();
     expect(screen.getByText(/The cat/)).toBeInTheDocument();
     expect(screen.getByText(/the mat/)).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: 'Blank to fill' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Blank to fill')).toBeInTheDocument();
   });
 
   it('renders all answer options', () => {
@@ -32,12 +32,12 @@ describe('FillInBlank', () => {
   it('allows selecting an option', () => {
     render(<FillInBlank {...mockProps} />);
 
-    const option = screen.getByRole('button', { name: 'Option: on' });
+    const option = screen.getByRole('button', { name: /Option: on/ });
     fireEvent.click(option);
 
     expect(option).toHaveAttribute('aria-pressed', 'true');
     // Check that the blank now shows the selected option
-    const blank = screen.getByRole('textbox', { name: 'Blank to fill' });
+    const blank = screen.getByLabelText(/Selected: on/);
     expect(blank.textContent).toBe('on');
   });
 
@@ -119,13 +119,13 @@ describe('FillInBlank', () => {
   it('highlights correct answer after submission', () => {
     render(<FillInBlank {...mockProps} />);
 
-    const wrongOption = screen.getByRole('button', { name: 'Option: in' });
+    const wrongOption = screen.getByRole('button', { name: /Option: in/ });
     fireEvent.click(wrongOption);
 
     const submitButton = screen.getByRole('button', { name: 'Submit answer' });
     fireEvent.click(submitButton);
 
-    const correctOption = screen.getByRole('button', { name: 'Option: on' });
+    const correctOption = screen.getByRole('button', { name: /Option: on.*correct answer/ });
     expect(correctOption.className).toContain('border-green-500');
   });
 });

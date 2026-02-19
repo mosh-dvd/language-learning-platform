@@ -134,7 +134,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       <button
         onClick={handleSpeak}
         disabled={playbackState === 'playing' || imageError}
-        className={`absolute top-2 right-2 sm:top-4 sm:right-4 p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 ${
+        className={`absolute top-2 right-2 sm:top-4 sm:right-4 p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 focus:ring-2 ${
           playbackState === 'playing'
             ? 'bg-blue-600 animate-pulse'
             : playbackState === 'error'
@@ -143,19 +143,20 @@ export const ImageCard: React.FC<ImageCardProps> = ({
         }`}
         aria-label={
           playbackState === 'playing'
-            ? `Playing audio for: ${text}`
+            ? 'Audio playing'
             : playbackState === 'error'
-            ? 'Audio error, click to retry'
-            : `Play audio for: ${text}`
+            ? 'Audio error'
+            : 'Play audio'
         }
         aria-pressed={playbackState === 'playing'}
+        aria-live="polite"
         aria-describedby={errorMessage ? 'audio-error' : undefined}
         title={
           playbackState === 'playing'
-            ? 'Audio playing'
+            ? `Playing audio for: ${text}`
             : playbackState === 'error'
             ? 'Click to retry'
-            : 'Play audio (Space or Enter)'
+            : `Play audio for: ${text}`
         }
       >
         {playbackState === 'playing' ? (

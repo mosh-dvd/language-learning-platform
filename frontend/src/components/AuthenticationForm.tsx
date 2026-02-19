@@ -57,7 +57,7 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({
     setErrorMessage(null);
 
     try {
-      const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const endpoint = mode === 'register' ? 'http://localhost:3000/api/auth/register' : 'http://localhost:3000/api/auth/login';
       
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -67,36 +67,15 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
+        const result = await response.json();
         throw new Error(result.error || 'Authentication failed');
       }
 
-      if (mode === 'register') {
-        // After registration, automatically log in
-        const loginResponse = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        });
+      const result = await response.json();
 
-        const loginResult = await loginResponse.json();
-
-        if (!loginResponse.ok) {
-          throw new Error(loginResult.error || 'Login after registration failed');
-        }
-
-        onSuccess(loginResult.user, loginResult.token);
-      } else {
-        onSuccess(result.user, result.token);
-      }
-
+      // Both register and login now return token directly
+      onSuccess(result.user, result.token);
       reset();
     } catch (error) {
       const err = error instanceof Error ? error : new Error('An unexpected error occurred');

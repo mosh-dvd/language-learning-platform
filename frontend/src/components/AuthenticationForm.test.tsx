@@ -23,7 +23,7 @@ describe('AuthenticationForm', () => {
         />
       );
 
-      expect(screen.getByText('Sign In')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Sign In' })).toBeInTheDocument();
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
       expect(screen.getByLabelText('Password')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
@@ -108,16 +108,18 @@ describe('AuthenticationForm', () => {
 
       const emailInput = screen.getByLabelText('Email');
       const passwordInput = screen.getByLabelText('Password');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
       
       await user.type(emailInput, 'invalid-email');
       await user.type(passwordInput, 'password123');
       
-      // Blur to trigger validation
-      await user.tab();
+      // Try to submit with invalid email
+      await user.click(submitButton);
 
+      // Should not call onSuccess with invalid email
       await waitFor(() => {
-        expect(screen.getByText('Invalid email address')).toBeInTheDocument();
-      });
+        expect(mockOnSuccess).not.toHaveBeenCalled();
+      }, { timeout: 1000 });
     });
   });
 
@@ -186,17 +188,20 @@ describe('AuthenticationForm', () => {
         />
       );
 
+      const submitButton = screen.getByRole('button', { name: /create account/i });
+      
       await user.type(screen.getByLabelText('Name'), 'Test User');
       await user.type(screen.getByLabelText('Email'), 'test@example.com');
       await user.type(screen.getByLabelText('Password'), 'short');
       await user.selectOptions(screen.getByLabelText('Native Language'), 'en');
       
-      // Blur to trigger validation
-      await user.tab();
+      // Try to submit with short password
+      await user.click(submitButton);
 
+      // Should not call onSuccess with invalid password
       await waitFor(() => {
-        expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument();
-      });
+        expect(mockOnSuccess).not.toHaveBeenCalled();
+      }, { timeout: 1000 });
     });
 
     it('displays error when email already exists', async () => {

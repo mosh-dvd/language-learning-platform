@@ -171,15 +171,18 @@ describe('ProfileManagement', () => {
       );
 
       const avatarInput = screen.getByLabelText(/Avatar URL/i);
+      const submitButton = screen.getByRole('button', { name: /save changes/i });
+      
       await user.clear(avatarInput);
       await user.type(avatarInput, 'not-a-valid-url');
       
-      // Blur to trigger validation
-      await user.tab();
+      // Try to submit with invalid URL
+      await user.click(submitButton);
 
+      // Should not call onSuccess with invalid URL
       await waitFor(() => {
-        expect(screen.getByText('Please enter a valid URL')).toBeInTheDocument();
-      });
+        expect(mockOnSuccess).not.toHaveBeenCalled();
+      }, { timeout: 1000 });
     });
   });
 

@@ -10,6 +10,15 @@ import fc from 'fast-check';
 import { LearningView, Lesson, Exercise } from './LearningView';
 
 describe('LearningView Property-Based Tests', () => {
+  let cleanup: (() => void) | null = null;
+
+  afterEach(() => {
+    if (cleanup) {
+      cleanup();
+      cleanup = null;
+    }
+  });
+
   // Generator for exercise IDs
   const exerciseIdArb = fc.uuid();
 
@@ -74,8 +83,15 @@ describe('LearningView Property-Based Tests', () => {
   it('Property 15: Lesson navigation - starting displays exercise 1, completing i displays i+1', () => {
     fc.assert(
       fc.property(lessonArb, (lesson) => {
+        // Clean up any previous render
+        if (cleanup) {
+          cleanup();
+          cleanup = null;
+        }
+
         const onComplete = vi.fn();
         const { unmount } = render(<LearningView lesson={lesson} onComplete={onComplete} />);
+        cleanup = unmount;
 
         try {
           // Property: Starting the lesson should display exercise 1
@@ -99,7 +115,7 @@ describe('LearningView Property-Based Tests', () => {
             expect(screen.getByText(`Exercise ${i + 2} of ${lesson.exercises.length}`)).toBeInTheDocument();
           }
         } finally {
-          unmount();
+          // Don't unmount here, let afterEach handle it
         }
       }),
       { numRuns: 100 }
@@ -140,8 +156,15 @@ describe('LearningView Property-Based Tests', () => {
           });
         }),
         (lesson) => {
+          // Clean up any previous render
+          if (cleanup) {
+            cleanup();
+            cleanup = null;
+          }
+
           const onComplete = vi.fn();
           const { unmount } = render(<LearningView lesson={lesson} onComplete={onComplete} />);
+          cleanup = unmount;
 
           try {
             // Complete first two exercises and navigate forward
@@ -171,7 +194,7 @@ describe('LearningView Property-Based Tests', () => {
             expect(screen.getByText(`Exercise 1 of ${lesson.exercises.length}`)).toBeInTheDocument();
             expect(screen.getByText(lesson.exercises[0].text)).toBeInTheDocument();
           } finally {
-            unmount();
+            // Don't unmount here, let afterEach handle it
           }
         }
       ),
@@ -214,8 +237,15 @@ describe('LearningView Property-Based Tests', () => {
           });
         }),
         (lesson) => {
+          // Clean up any previous render
+          if (cleanup) {
+            cleanup();
+            cleanup = null;
+          }
+
           const onComplete = vi.fn();
           const { unmount } = render(<LearningView lesson={lesson} onComplete={onComplete} />);
+          cleanup = unmount;
 
           try {
             // Complete first exercise to show navigation
@@ -228,7 +258,7 @@ describe('LearningView Property-Based Tests', () => {
             // Verify we're still on exercise 1
             expect(screen.getByText(`Exercise 1 of ${lesson.exercises.length}`)).toBeInTheDocument();
           } finally {
-            unmount();
+            // Don't unmount here, let afterEach handle it
           }
         }
       ),
@@ -245,8 +275,15 @@ describe('LearningView Property-Based Tests', () => {
   it('Property 16: Lesson completion tracking - completing all N exercises marks lesson as complete', () => {
     fc.assert(
       fc.property(lessonArb, (lesson) => {
+        // Clean up any previous render
+        if (cleanup) {
+          cleanup();
+          cleanup = null;
+        }
+
         const onComplete = vi.fn();
         const { unmount } = render(<LearningView lesson={lesson} onComplete={onComplete} />);
+        cleanup = unmount;
 
         try {
           // Complete all N exercises
@@ -271,7 +308,7 @@ describe('LearningView Property-Based Tests', () => {
           expect(screen.getByText('Lesson Complete!')).toBeInTheDocument();
           expect(screen.getByText(new RegExp(`You've completed all ${lesson.exercises.length} exercises`, 'i'))).toBeInTheDocument();
         } finally {
-          unmount();
+          // Don't unmount here, let afterEach handle it
         }
       }),
       { numRuns: 100 }
